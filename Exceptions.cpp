@@ -68,12 +68,11 @@ namespace Clustering {
     ZeroClustersEx::ZeroClustersEx(){__name.clear}
 
     // Name Getter
-    string ZeroClustersEx::getName() const{ return __name; }
-
-
-
+    string ZeroClustersEx::getName() const{return this -> __name; }
 
     ostream &Clustering::operator<<(ostream &os, const ZeroClustersEx &ex){
+        
+        os << ex << endl;
         
     }
 
@@ -86,13 +85,14 @@ namespace Clustering {
     }
 
     // Filename Getter
-    string DataFileOpenEx::getFilename() const{ return __filename; }
+    string DataFileOpenEx::getFilename() const{ return this -> __filename; }
 
     // Name Getter
-    string DataFileOpenEx::getName() const { return __name; }
+    string DataFileOpenEx::getName() const { return this -> __name; }
 
     ostream &Clustering::operator<<(ostream &os, const DataFileOpenEx &ex){
         
+        os << ex << endl;
         
     }
 
@@ -105,10 +105,12 @@ namespace Clustering {
     }
 
     // Name Getter
-    string ZeroDimensionsEx::getName() const { return __name; }
+    string ZeroDimensionsEx::getName() const { return this -> __name; }
 
 
     ostream &Clustering::operator<<(ostream &os, const ZeroDimensionsEx &ex){
+        
+        os << ex << endl;
         
     }
 
@@ -122,10 +124,12 @@ namespace Clustering {
     }
 
     // Name Getter
-    string EmptyClusterEx::getName() const { return __name; }
+    string EmptyClusterEx::getName() const { return this -> __name; }
 
 
     ostream &Clustering::operator<<(ostream &os, const EmptyClusterEx &ex){
+        
+        os << ex << endl;
         
     }
 }
