@@ -13,22 +13,24 @@ namespace Clustering {
 
     OutOfBoundsEx::OutOfBoundsEx(unsigned int c, int r) {
         
-        this->__current = c;
-        this->__rhs = r;
+        this -> __current = c;
+        this -> __rhs = r;
 
     }
 
     // Current Getter
-    unsigned int OutOfBoundsEx::getCurrent() const { return __current;}
+    unsigned int OutOfBoundsEx::getCurrent() const { return this -> __current;}
 
     // Rhs Getter
-    int OutOfBoundsEx::getRhs() const { return __rhs; }
+    int OutOfBoundsEx::getRhs() const { return this -> __rhs; }
 
     // Name getter
-    string OutOfBoundsEx::getName() const { return __name; }
+    string OutOfBoundsEx::getName() const { return this -> __name; }
 
 
     ostream &Clustering::operator<<(ostream &os, const OutOfBoundsEx &ex) {
+        
+         os << ex << endl;
         
     }
 
