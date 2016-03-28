@@ -65,7 +65,7 @@ namespace Clustering {
 //      ZeroClusterEX Class
 //***************************************************
 
-    ZeroClustersEx::ZeroClustersEx(){__name.clear}
+    ZeroClustersEx::ZeroClustersEx(){__name.clear()}
 
     // Name Getter
     string ZeroClustersEx::getName() const{return this -> __name; }
@@ -119,9 +119,7 @@ namespace Clustering {
 //***************************************************
 
 
-    EmptyClusterEx::EmptyClusterEx(){
-
-    }
+    EmptyClusterEx::EmptyClusterEx(){__name.clear()}
 
     // Name Getter
     string EmptyClusterEx::getName() const { return this -> __name; }
