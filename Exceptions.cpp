@@ -19,18 +19,18 @@ namespace Clustering {
     }
 
     // Current Getter
-    unsigned int OutOfBoundsEx::getCurrent() const { return this -> __current;}
+    unsigned int OutOfBoundsEx::getCurrent() const{return this -> __current;}
 
     // Rhs Getter
-    int OutOfBoundsEx::getRhs() const { return this -> __rhs; }
+    int OutOfBoundsEx::getRhs() const{return this -> __rhs; }
 
     // Name getter
-    string OutOfBoundsEx::getName() const { return this -> __name; }
+    string OutOfBoundsEx::getName() const{return this -> __name; }
 
 
     ostream &Clustering::operator<<(ostream &os, const OutOfBoundsEx &ex) {
         
-         os << ex << endl;
+        os << ex << endl;
         
     }
 
@@ -40,20 +40,24 @@ namespace Clustering {
 
     DimensionalityMismatchEx::DimensionalityMismatchEx(unsigned int c, unsigned int r){
         
+        this -> __current = c;
+        this -> __rhs = r;
+        
     }
 
     // Current Getter
-    unsigned int DimensionalityMismatchEx::getCurrent() const { return __current; }
+    unsigned int DimensionalityMismatchEx::getCurrent() const{return this -> __current; }
 
     // Rhs Getter
-    unsigned int DimensionalityMismatchEx::getRhs() const{ return __rhs; }
+    unsigned int DimensionalityMismatchEx::getRhs() const{return this -> __rhs; }
 
     // Name Getter
-    string DimensionalityMismatchEx::getName() const
-    { return __name;}
+    string DimensionalityMismatchEx::getName() const{return this -> __name;}
 
 
     ostream &Clustering::operator<<(ostream &os, const DimensionalityMismatchEx &ex){
+        
+        os << ex << endl;
 
     }
 
@@ -61,9 +65,7 @@ namespace Clustering {
 //      ZeroClusterEX Class
 //***************************************************
 
-    ZeroClustersEx::ZeroClustersEx(){
-
-    }
+    ZeroClustersEx::ZeroClustersEx(){__name.clear}
 
     // Name Getter
     string ZeroClustersEx::getName() const{ return __name; }
