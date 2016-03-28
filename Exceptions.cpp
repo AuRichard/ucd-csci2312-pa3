@@ -12,6 +12,9 @@ namespace Clustering {
 //***************************************************
 
     OutOfBoundsEx::OutOfBoundsEx(unsigned int c, int r) {
+        
+        this->__current = c;
+        this->__rhs = r;
 
     }
 
