@@ -31,7 +31,7 @@ namespace Clustering {
 
     ostream &Clustering::operator<<(ostream &os, const OutOfBoundsEx &ex) {
         
-        os << ex << endl;
+        os << ex.__name << endl;
         
     }
 
@@ -58,7 +58,7 @@ namespace Clustering {
 
     ostream &Clustering::operator<<(ostream &os, const DimensionalityMismatchEx &ex){
         
-        os << ex << endl;
+        os << ex.__name << endl;
 
     }
 
@@ -73,7 +73,7 @@ namespace Clustering {
 
     ostream &Clustering::operator<<(ostream &os, const ZeroClustersEx &ex){
         
-        os << ex << endl;
+        os << ex.__name << endl;
         
     }
 
@@ -91,7 +91,7 @@ namespace Clustering {
 
     ostream &Clustering::operator<<(ostream &os, const DataFileOpenEx &ex){
         
-        os << ex << endl;
+        os << ex.__name << endl;
         
     }
 
@@ -107,7 +107,7 @@ namespace Clustering {
 
     ostream &Clustering::operator<<(ostream &os, const ZeroDimensionsEx &ex){
         
-        os << ex << endl;
+        os << ex.__name << endl;
         
     }
 
