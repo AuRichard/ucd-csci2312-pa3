@@ -22,10 +22,10 @@ namespace Clustering {
     unsigned int OutOfBoundsEx::getCurrent() const{return this -> __current;}
 
     // Rhs Getter
-    int OutOfBoundsEx::getRhs() const{return this -> __rhs; }
+    int OutOfBoundsEx::getRhs() const{return this -> __rhs;}
 
     // Name getter
-    string OutOfBoundsEx::getName() const{return this -> __name; }
+    string OutOfBoundsEx::getName() const{return this -> __name;}
 
 
     ostream &Clustering::operator<<(ostream &os, const OutOfBoundsEx &ex) {
@@ -46,10 +46,10 @@ namespace Clustering {
     }
 
     // Current Getter
-    unsigned int DimensionalityMismatchEx::getCurrent() const{return this -> __current; }
+    unsigned int DimensionalityMismatchEx::getCurrent() const{return this -> __current;}
 
     // Rhs Getter
-    unsigned int DimensionalityMismatchEx::getRhs() const{return this -> __rhs; }
+    unsigned int DimensionalityMismatchEx::getRhs() const{return this -> __rhs;}
 
     // Name Getter
     string DimensionalityMismatchEx::getName() const{return this -> __name;}
@@ -68,7 +68,7 @@ namespace Clustering {
     ZeroClustersEx::ZeroClustersEx(){__name.clear()}
 
     // Name Getter
-    string ZeroClustersEx::getName() const{return this -> __name; }
+    string ZeroClustersEx::getName() const{return this -> __name;}
 
     ostream &Clustering::operator<<(ostream &os, const ZeroClustersEx &ex){
         
@@ -80,15 +80,13 @@ namespace Clustering {
 //      DataFileOpenEx Class
 //***************************************************
 
-    DataFileOpenEx::DataFileOpenEx(string filename) {
-        
-    }
+    DataFileOpenEx::DataFileOpenEx(string filename) {this-> __filename = filename;}
 
     // Filename Getter
-    string DataFileOpenEx::getFilename() const{ return this -> __filename; }
+    string DataFileOpenEx::getFilename() const{return this -> __filename;}
 
     // Name Getter
-    string DataFileOpenEx::getName() const { return this -> __name; }
+    string DataFileOpenEx::getName() const {return this -> __name;}
 
     ostream &Clustering::operator<<(ostream &os, const DataFileOpenEx &ex){
         
@@ -100,12 +98,10 @@ namespace Clustering {
 //      ZeroDimensionsEx Class
 //***************************************************
 
-    ZeroDimensionsEx::ZeroDimensionsEx(){
-
-    }
+    ZeroDimensionsEx::ZeroDimensionsEx(){__name.clear()}
 
     // Name Getter
-    string ZeroDimensionsEx::getName() const { return this -> __name; }
+    string ZeroDimensionsEx::getName() const {return this -> __name;}
 
 
     ostream &Clustering::operator<<(ostream &os, const ZeroDimensionsEx &ex){
@@ -122,7 +118,7 @@ namespace Clustering {
     EmptyClusterEx::EmptyClusterEx(){__name.clear()}
 
     // Name Getter
-    string EmptyClusterEx::getName() const { return this -> __name; }
+    string EmptyClusterEx::getName() const {return this -> __name;}
 
 
     ostream &Clustering::operator<<(ostream &os, const EmptyClusterEx &ex){
