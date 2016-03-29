@@ -11,6 +11,12 @@ namespace Clustering {
         __k = k;
         __iFileName = filename;
         __maxIter = maxIter;
+        __numNonempty = 1
+        __clusters = new Cluster *[k];
+        
+        // If __k is zero, throw an exception:
+        if(__k == 0)
+            throw ZeroClustersEx();
 
     }
     
