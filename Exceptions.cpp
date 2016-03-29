@@ -15,6 +15,7 @@ namespace Clustering {
         
         this -> __current = c;
         this -> __rhs = r;
+        __name = "OutOfBoundsEx";
 
     }
 
@@ -65,7 +66,7 @@ namespace Clustering {
 //      ZeroClusterEX Class
 //***************************************************
 
-    ZeroClustersEx::ZeroClustersEx(){__name.clear()}
+    ZeroClustersEx::ZeroClustersEx(){__name = "ZeroClustersEx";}
 
     // Name Getter
     string ZeroClustersEx::getName() const{return this -> __name;}
@@ -98,7 +99,7 @@ namespace Clustering {
 //      ZeroDimensionsEx Class
 //***************************************************
 
-    ZeroDimensionsEx::ZeroDimensionsEx(){__name.clear()}
+    ZeroDimensionsEx::ZeroDimensionsEx(){__name = "ZeroDimensionsEx";}
 
     // Name Getter
     string ZeroDimensionsEx::getName() const {return this -> __name;}
@@ -115,7 +116,7 @@ namespace Clustering {
 //***************************************************
 
 
-    EmptyClusterEx::EmptyClusterEx(){__name.clear()}
+    EmptyClusterEx::EmptyClusterEx(){__name = "EmptyClusterEx";}
 
     // Name Getter
     string EmptyClusterEx::getName() const {return this -> __name;}
@@ -123,7 +124,7 @@ namespace Clustering {
 
     ostream &Clustering::operator<<(ostream &os, const EmptyClusterEx &ex){
         
-        os << ex << endl;
+        os << ex.__name << endl;
         
     }
 }
