@@ -1,379 +1,340 @@
 //
-// Created by Richard Au on 3/20/2016.
+// Created by Richard Au on 3/20/2016. Modified for PA3
 //
 
-#include <string>
+#include <cstdlib>
+#include <assert.h>
 #include <sstream>
+#include <fstream>
 #include <algorithm>
 #include "Cluster.h"
-#include <iostream>
-using namespace std;
-using namespace Clustering;
-namespace Clustering
-{
-    LNode::LNode(const Point & newPoint, LNodePtr nextPtr):point(newPoint)
-    {
-        point=newPoint;
-        next=nextPtr;
+#include "Exceptions.h"
+namespace Clustering{
+    unsigned int Cluster::__idGenerator = 0;
+    LNode::LNode(const Point &p, LNodePtr n = nullptr) : point(p) {
+        next = n;
     }
-    Clustering::Cluster::Cluster()
-    {
+    Cluster::Centroid::Centroid(unsigned int d, const Cluster &c) : __c(c), __p(Point(d)) {
+        __dimensions = d;
+        __valid = false;
+    }
+    const Point Cluster::Centroid::get() const{
+        return __p;
+    }
+    void Cluster::Centroid::set(const Point &p){
+        __p = p;
+        __valid = true;
+    }
+    bool Cluster::Centroid::isValid() const{
+        return __valid;
+    }
+    void Cluster::Centroid::setValid(bool valid){
+        __valid = valid;
+    }
+    void Cluster::Centroid::compute() {
+        double total = 0;
+        Point tempP(__dimensions);
+        if(__c.__points == nullptr)
+        this->toInfinity();
+        else {
+            for (int point = 0; point < __c.__size; ++point)
+            tempP += __c[point];
+            for (int dim = 0; dim < __dimensions; ++dim)
+            __p[dim] = tempP[dim] / __c.__size;
+        }
+        __valid = true;
+    }
+    bool Cluster::Centroid::equal(const Point &p) const{
+        bool condition = true;
+        for (unsigned int count = 0; count < __dimensions; ++count)
+        if (__p.getValue(count) != p.getValue(count))
+        condition = false;
+        return condition;
+    }
+    void Cluster::Centroid::toInfinity(){
+        for(int count = 0; count < __dimensions; ++count)
+        __p[count] = std::numeric_limits<double>::max();
+    }
+    Cluster::Cluster(unsigned int d) : centroid(d, *this){
+        __dimensionality = d;
         __size = 0;
         __points = nullptr;
+        __id = __idGenerator++;
     }
-    int Clustering::Cluster::getSize() const
-    { return __size; }
-    Clustering::Cluster::Cluster(const Cluster & rhs):Cluster()
-    {
-        for (int count = 0;
-             count < rhs.__size;
-             count++)
-            add(rhs[count]);
-    }
-    Cluster &Clustering::Cluster::operator=(const Cluster &rhs)
-    {
-        LNodePtr curr;
-        if(this==&rhs)
-            return *this;
-        else
-        {
-            while (__points != nullptr)
-            {
-                curr = __points;
-                __points = __points->next;
-                delete curr;
-                __size--;
-            }
-            for (int count = 0;
-                 count < rhs.__size;
-                 count++)
-                add(rhs[count]);
+    Cluster::Cluster(const Cluster &cluster) : centroid(cluster.__dimensionality, *this){
+        __dimensionality = cluster.__dimensionality;
+        __points = nullptr;
+        __size = 0;
+        for(int count = 0; count < cluster.__size; ++count) {
+            add(cluster[count]);
         }
+        __id = cluster.__id;
+    }
+    Cluster &Cluster::operator=(const Cluster &cluster) {
+        if(this == &cluster)
+        return *this;
+        else {
+            if(__points != nullptr){
+                LNodePtr currPtr = __points;
+                LNodePtr nextPtr = nullptr;
+                while(currPtr != nullptr){
+                    nextPtr = currPtr->next;
+                    delete currPtr;
+                    currPtr = nextPtr;
+                }
+                __size = 0;
+                __points = nullptr;
+            }
+            for(int count = 0; count < cluster.__size; ++count) {
+                add(cluster[count]);
+            }
+        }
+        __id = cluster.__id;
         return *this;
     }
-    const Point &Cluster::operator[](unsigned int index) const
-    {
-        LNodePtr cursor=__points;
-        for(int count =0;
-            (count < index) && (cursor->next != nullptr);
-            count++)
-            cursor=cursor->next;
-        return cursor->point;
-    }
-    Clustering::Cluster::~Cluster()
-    {
-        if(__points!=nullptr)
-        {
-            LNodePtr prev=__points;
-            LNodePtr curr=nullptr;
-            while (prev != nullptr)
-            {
-                curr = prev->next;
-                delete prev;
-                prev = curr;
-            }
-        }
-    }
-//**************************************************
-//                  add
-//
-// task:    This adds a point to linked list in
-//          lexographical (alphabetical) order
-// Postcondition: a point is added to the linked list,
-//                retaining the lexigraphical order
-//
-//***************************************************
-    void Clustering::Cluster::add(const Point &point)
-    {
-        LNodePtr insertPtr=new LNode(point, nullptr);
-        LNodePtr curr=__points;
-        LNodePtr prev=__points;
-        if(__points==nullptr)
-        {
-            __points = insertPtr;
-            __size++;
-            return;
-        }
-        else if(__points->next==nullptr)
-        {
-            if(point<__points->point)
-            {
-                __points=insertPtr;
-                insertPtr->next=prev;
-                __size++;
-                return;
-            }
-            else
-            {
-                __points->next=insertPtr;
-                __size++;
-                return;
+    Cluster::~Cluster(){
+        if(__points != nullptr){
+            LNodePtr prevPtr = __points;
+            LNodePtr currPtr = nullptr;
+            while( prevPtr != nullptr){
+                currPtr =  prevPtr->next;
+                delete  prevPtr;
+                prevPtr = currPtr;
             }
         }
         else
-        {
-            curr=curr->next;
-            if(point < prev->point)
-            {
+        assert(__size==0);
+    }
+    unsigned int Cluster::getSize() const {
+        return __size;
+    }
+    unsigned int Cluster::getDimensionality() const{
+        return __dimensionality;
+    }
+    unsigned int Cluster::getId() const{
+        return __id;
+    }
+    void Cluster::pickCentroids(unsigned int k, Point **pointArray) {
+        if(k >= __size){
+            for(int count = 0; count < k; ++count){
+                if(count < __size)
+                *pointArray[count] = (*this)[count];
+                else
+                for(int i = 0; i < __dimensionality; ++i)
+                (*pointArray[count])[i] = std::numeric_limits<double>::max();
+            }
+        }
+        else {
+            std::vector<Point> kPoints;
+            std::vector<Point> allPoints;
+            allPoints.reserve(__size);
+            kPoints.reserve(k);
+            for (int count = 0; count < __size; ++count)
+            allPoints.push_back((*this)[count]);
+            for (int count = 0; count < k; ++count)
+            kPoints.push_back(allPoints[count]);
+            int vCount;
+            int furthestIndex;
+            for (int kCount = 0; kCount < k; ++kCount) {
+                furthestIndex = 0;
+                for (vCount = 1; vCount < allPoints.size(); ++vCount) {
+                    if (kPoints[kCount].distanceTo(allPoints[furthestIndex]) > kPoints[kCount].distanceTo(allPoints[vCount]))
+                    furthestIndex = vCount;
+                }
+                kPoints[kCount] = allPoints[furthestIndex];
+                allPoints.erase(allPoints.begin() + furthestIndex);
+            }
+            for (int count = 0; count < k; ++count)
+            *pointArray[count] = kPoints[count];
+        }
+    }
+    void Cluster::add(const Point &point) {
+        if(point.getDims() != __dimensionality)
+        throw Clustering::DimensionalityMismatchEx(__dimensionality, point.getDims());
+        Point p(point);
+        LNodePtr insertPtr = new LNode(p, nullptr);
+        LNodePtr prev = __points;
+        LNodePtr next = __points;
+        centroid.setValid(false);
+        if(__points == nullptr) {
+            __points = insertPtr;
+            __size++;
+        }
+        else if(__points->next == nullptr){
+            if (point < __points->point) {
                 __points = insertPtr;
-                insertPtr->next=prev;
+                insertPtr->next = prev;
+                __size++;
+            }
+            else {
+                __points->next = insertPtr;
+                __size++;
+            }
+        }
+        else{
+            next = next->next;
+            if(point < prev->point){
+                __points = insertPtr;
+                insertPtr->next = prev;
                 __size++;
                 return;
             }
-            while(curr!=nullptr)
-            {
-                if(point < curr->point)
-                {
-                    prev->next=insertPtr;
-                    insertPtr->next=curr;
+            while(next != nullptr){
+                if(point < next->point) {
+                    prev->next = insertPtr;
+                    insertPtr->next = next;
                     __size++;
                     return;
                 }
-                curr = curr->next;
+                next = next->next;
                 prev = prev->next;
             }
-            prev->next=insertPtr;
+            prev->next = insertPtr;
             __size++;
         }
     }
-//**************************************************
-//                  remove
-//
-// task:    This removes a point from the cluster
-// Postcondition: Takes in an point as an parameter
-//
-//***************************************************
-    const Point &Clustering::Cluster::remove(const Point &point)
-    {
-        LNodePtr curr=__points;
-        LNodePtr prev=__points;
-        if(__points==nullptr)
+    const Point &Cluster::remove(const Point &point) {
+        if(point.getDims() != __dimensionality)
+        throw Clustering::DimensionalityMismatchEx(__dimensionality, point.getDims());
+        LNodePtr currPtr = __points;
+        LNodePtr nextPtr = __points;
+        if(__points == nullptr) {
             return point;
-        else if(__points->point == point)
-        {
-            curr=__points;
-            __points=__points->next;
-            delete curr;
+        }
+        else if(__points->point == point){
+            __points = __points->next;
+            delete currPtr;
             __size--;
         }
-        else
-        {
-            curr=curr->next;
-            while (curr!= nullptr)
-            {
-                if (curr->point == point)
-                {
-                    prev->next=curr->next;
-                    delete curr;
+        else{
+            currPtr = __points;
+            nextPtr = __points->next;
+            while(nextPtr != nullptr){
+                if(nextPtr->point == point){
+                    currPtr->next = nextPtr->next;
+                    delete nextPtr;
                     __size--;
                     break;
                 }
-                curr = curr->next;
-                prev = prev->next;
+                currPtr = nextPtr;
+                nextPtr = nextPtr->next;
             }
         }
+        centroid.setValid(false);
         return point;
     }
-//**************************************************
-//                  Contains
-//
-// task:    Checks if a point is in the cluster
-// Postcondition: Takes in an point as an parameter
-//
-//***************************************************
-    bool Clustering::Cluster::contains(const Point &point)
-    {
-        for (LNodePtr Cursor = this->__points;
-             Cursor != nullptr;
-             Cursor = Cursor->next)
-        {
-            if (Cursor->point == point)
-            {
-                return true;
-            }
+    bool Cluster::contains(const Point &point) const{
+        LNodePtr cursor = __points;
+        while(cursor != nullptr){
+            if (cursor->point == point)
+            return true;
+            cursor = cursor->next;
         }
         return false;
     }
-//**************************************************
-//                  == Operator
-//
-// task:    Check if cluster are the same size
-// Postcondition: Takes in 2 clusters as parameters
-//
-//***************************************************
-    bool operator==(const Cluster &clust1, const Cluster &clust2)
-    {
-        LNodePtr clustObject1= clust1.__points;
-        LNodePtr clustObject2=clust2.__points;
-        bool equal=true;
-        if (clust1.__size != clust2.__size)
-            equal=false;
-        while(clustObject1!=nullptr && clustObject2!=nullptr)
-        {
-            if(clustObject1->point!=clustObject2->point)
-                equal=false;
-            clustObject1=clustObject1->next;
-            clustObject2=clustObject2->next;
+    const Point &Cluster::operator[](unsigned int index) const {
+        if(__size == 0)
+        throw Clustering::EmptyClusterEx();
+        if(index < 0 || index >= __size)
+        throw Clustering::OutOfBoundsEx(__size, index);
+        else {
+            LNodePtr cursor = __points;
+            for (int count = 0; count < index; ++count)
+            cursor = cursor->next;
+            return cursor->point;
         }
-        return equal;
     }
-//**************************************************
-//                  != Operator
-//
-// task:    Check if cluster are not the same size
-// Postcondition: Takes in 2 clusters as parameters
-//
-//***************************************************
-    bool operator!=(const Cluster &clust1, const Cluster &clust2)
-    { return (!(clust1==clust2)); }
-    Cluster &Clustering::Cluster::operator+=(const Point &point)
-    {
+    std::ostream &operator<<(std::ostream &ostream1, const Cluster &cluster) {
+        LNodePtr cursor = cluster.__points;
+        for(int count = 0; count < cluster.__size; ++count){
+            ostream1 << cursor->point;
+            cursor = cursor->next;
+            ostream1 << std::endl;
+        }
+        return ostream1;
+    }
+    std::istream &operator>>(std::istream &istream, Clustering::Cluster &cluster) {
+        std::string line;
+        while (getline(istream,line)) {
+            Point *pointPtr = new Clustering::Point(cluster.__dimensionality);
+            std::stringstream lineStream(line);
+            try {
+                lineStream >> *pointPtr;
+                cluster.add(*pointPtr);
+            }
+            catch (DimensionalityMismatchEx &ex) {
+                pointPtr->rewindIdGen();
+            }
+            delete pointPtr;
+        }
+        return istream;
+    }
+    bool operator==(const Cluster &cluster1, const Cluster &cluster2) {
+        if(cluster1.__dimensionality != cluster2.__dimensionality)
+        throw Clustering::DimensionalityMismatchEx(cluster1.__dimensionality, cluster2.__dimensionality);
+        if(cluster1.__size != cluster2.__size)
+        return false;
+        LNodePtr cursor1 = cluster1.__points;
+        LNodePtr cursor2 = cluster2.__points;
+        bool condition = true;
+        while (cursor1 != nullptr && cursor2 != nullptr)
+        {
+            if(cursor1->point != cursor2->point)
+            condition = false;
+            cursor1 = cursor1->next;
+            cursor2 = cursor2->next;
+        }
+        return condition;
+    }
+    bool operator!=(const Cluster &cluster, const Cluster &cluster1) {
+        return(!(cluster == cluster1));
+    }
+    Cluster &Cluster::operator+=(const Point &point) {
         add(point);
         return *this;
     }
-//**************************************************
-//                  -= Operator
-//
-// task:    Removes a point from cluster
-// Postcondition: Takes in a point as a parameter
-//
-//***************************************************
-    Cluster &Clustering::Cluster::operator-=(const Point &point)
-    {
+    Cluster &Cluster::operator-=(const Point &point) {
         remove(point);
         return *this;
     }
-//**************************************************
-//                  + Operator
-//
-// task:    Adds a new point to create a new cluster
-// Postcondition: Takes in a cluster and a point as
-// parameters
-//
-//***************************************************
-    const Cluster operator+(const Cluster & clust1, const Point &point)
-    {
-        Cluster clust2(clust1);
-        clust2+= point;
-        return clust2;
-    }
-//**************************************************
-//                  - Operator
-//
-// task:    Removes a point to create a new cluster
-// Postcondition: Takes in a cluster and a point as
-// parameters
-//
-//***************************************************
-    const Cluster operator-(const Cluster & clust1, const Point &point)
-    {
-        Cluster clust2(clust1);
-        clust2-= point;
-        return clust2;
-    }
-//**************************************************
-//                  += Operator
-//
-// task:    Combines two cluster
-// Postcondition: takes in a cluster as a parameter
-//
-//***************************************************
-    Cluster &Clustering::Cluster::operator+=(const Cluster & clust1)
-    {
-        for (int count = 0;
-             count < clust1.__size;
-             count++)
-        {
-            if (!contains(clust1[count]))
-                add(clust1[count]);
+    Cluster &Cluster::operator+=(const Cluster &cluster) {
+        if(__dimensionality != cluster.__dimensionality)
+        throw Clustering::DimensionalityMismatchEx(__dimensionality, cluster.__dimensionality);
+        for(int count = 0; count < cluster.__size; ++count){
+            if(!contains(cluster[count]))
+            add(cluster[count]);
         }
         return *this;
     }
-//**************************************************
-//                  -= Operator
-//
-// task:    create a new cluster by using differences
-//          between 2 existing clusters
-//
-// Postcondition: takes in a cluster as a parameter
-//
-//***************************************************
-    Cluster &Clustering::Cluster::operator-=(const Cluster &clust1)
-    {
-        for (int count = 0;
-             count < clust1.__size;
-             count++)
-            if (contains(clust1[count]))
-                remove(clust1[count]);
+    Cluster &Cluster::operator-=(const Cluster &cluster) {
+        if(__dimensionality != cluster.__dimensionality)
+        throw Clustering::DimensionalityMismatchEx(__dimensionality, cluster.__dimensionality);
+        for(int count = 0; count < cluster.__size; ++count){
+            if(contains(cluster[count]))
+            remove(cluster[count]);
+        }
         return *this;
     }
-//**************************************************
-//                  + Operator
-//
-// task:    Combines 2 clusters
-// Postcondition: Takes in 2 clusters as parameters
-//
-//***************************************************
-    const Cluster operator+(const Cluster &clust1, const Cluster &clust2)
-    {
-        Cluster clustObject1(clust1);
-        clustObject1+=clust2;
-        return clustObject1;
+    const Cluster operator+(const Cluster &cluster, const Point &point) {
+        Cluster c(cluster);
+        return c += point;
     }
-//**************************************************
-//                  - Operator
-//
-// task:    Asymetrical differences between 2 clusters
-// Postcondition: Takes in 2 clusters as parameters
-//
-//***************************************************
-    const Cluster operator-(const Cluster &clust1, const Cluster &clust2)
-    {
-        Cluster clustObject1(clust1);
-        clustObject1-=clust2;
-        return clustObject1;
+    const Cluster operator-(const Cluster &cluster, const Point &point) {
+        Cluster c(cluster);
+        return c -= point;
     }
-//**************************************************
-//                  << Operator
-//
-// task:    streams out cluster
-// Postcondition: Takes in cluster as parameter
-//
-//***************************************************
-    std::ostream &operator<<(std::ostream &os, const Cluster &clust1)
-    {
-        LNodePtr cursor=clust1.__points;
-        for(int count = 0;
-            count < clust1.__size;
-            count++)
-        {
-            os << cursor->point << std::endl;
-            cursor = cursor->next;
-        }
-        return os;
+    const Cluster operator+(const Cluster &cluster, const Cluster &cluster1) {
+        Cluster c(cluster);
+        return c += cluster1;
     }
-//**************************************************
-//                  >> Operator
-//
-// task:    streams in cluster
-// Postcondition: Takes in cluster as parameter
-//
-//***************************************************
-    std::istream &operator>>(std::istream &input, Cluster &clust1)
-    {
-        std::string holder;
-        while (getline(input,holder))
-        {
-            if (holder.empty())
-            {
-                return input;
-            }
-            int count = std::count(holder.begin(), holder.end(), ',');
-            Point ptr(count + 1);
-            std::istringstream ss(holder);
-            ss >> ptr;
-            clust1.add(ptr);
-        }
-        return input;
+    const Cluster operator-(const Cluster &cluster, const Cluster &cluster1) {
+        Cluster c(cluster);
+        return c -= cluster1;
     }
-} 
+    Cluster::Move::Move(const Point &p, Cluster &from, Cluster &to) : __p(p), __from(from), __to(to){
+    }
+    void Cluster::Move::perform() {
+        __to.add(__p);
+        __from.remove(__p);
+    }
+}

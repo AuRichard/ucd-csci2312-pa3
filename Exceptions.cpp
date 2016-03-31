@@ -2,129 +2,83 @@
 #include <cassert>
 #include <sstream>
 #include "Cluster.h"
-
-
-
+using namespace std;
 namespace Clustering {
-
-//**************************************************
-//      OutOfBoundsEX Class
-//***************************************************
-
     OutOfBoundsEx::OutOfBoundsEx(unsigned int c, int r) {
-        
         this -> __current = c;
         this -> __rhs = r;
-        __name = "OutOfBoundsEx";
-
+        __name = "OutOfBoundsEx: ";
     }
-
-    // Current Getter
-    unsigned int OutOfBoundsEx::getCurrent() const{return this -> __current;}
-
-    // Rhs Getter
-    int OutOfBoundsEx::getRhs() const{return this -> __rhs;}
-
-    // Name getter
-    string OutOfBoundsEx::getName() const{return this -> __name;}
-
-
-    ostream &Clustering::operator<<(ostream &os, const OutOfBoundsEx &ex) {
-        
-        os << ex.__name << endl;
-        
+    unsigned int OutOfBoundsEx::getCurrent() const{
+        return this -> __current;
     }
-
-//**************************************************
-//      DimensionalityMismatchEx Class
-//***************************************************
-
+    int OutOfBoundsEx::getRhs() const{
+        return this -> __rhs;
+    }
+    string OutOfBoundsEx::getName() const{
+        return this -> __name;
+    }
+    ostream &operator<<(ostream &os, const OutOfBoundsEx &ex) {
+        os << ex.getName() << " (current = " << ex.getCurrent() << ", rhs = " << ex.getRhs() << ')';
+        return os;
+    }
     DimensionalityMismatchEx::DimensionalityMismatchEx(unsigned int c, unsigned int r){
-        
         this -> __current = c;
         this -> __rhs = r;
-        
     }
-
-    // Current Getter
-    unsigned int DimensionalityMismatchEx::getCurrent() const{return this -> __current;}
-
-    // Rhs Getter
-    unsigned int DimensionalityMismatchEx::getRhs() const{return this -> __rhs;}
-
-    // Name Getter
-    string DimensionalityMismatchEx::getName() const{return this -> __name;}
-
-
-    ostream &Clustering::operator<<(ostream &os, const DimensionalityMismatchEx &ex){
-        
-        os << ex.__name << endl;
-
+    unsigned int DimensionalityMismatchEx::getCurrent() const{
+        return this -> __current;
     }
-
-//**************************************************
-//      ZeroClusterEX Class
-//***************************************************
-
-    ZeroClustersEx::ZeroClustersEx(){__name = "ZeroClustersEx";}
-
-    // Name Getter
-    string ZeroClustersEx::getName() const{return this -> __name;}
-
-    ostream &Clustering::operator<<(ostream &os, const ZeroClustersEx &ex){
-        
-        os << ex.__name << endl;
-        
+    unsigned int DimensionalityMismatchEx::getRhs() const{
+        return this -> __rhs;
     }
-
-//**************************************************
-//      DataFileOpenEx Class
-//***************************************************
-
-    DataFileOpenEx::DataFileOpenEx(string filename) {this-> __filename = filename;}
-
-    // Filename Getter
-    string DataFileOpenEx::getFilename() const{return this -> __filename;}
-
-    // Name Getter
-    string DataFileOpenEx::getName() const {return this -> __name;}
-
-    ostream &Clustering::operator<<(ostream &os, const DataFileOpenEx &ex){
-        
-        os << ex.__name << endl;
-        
+    string DimensionalityMismatchEx::getName() const{
+        return this -> __name;
     }
-
-//**************************************************
-//      ZeroDimensionsEx Class
-//***************************************************
-
-    ZeroDimensionsEx::ZeroDimensionsEx(){__name = "ZeroDimensionsEx";}
-
-    // Name Getter
-    string ZeroDimensionsEx::getName() const {return this -> __name;}
-
-
-    ostream &Clustering::operator<<(ostream &os, const ZeroDimensionsEx &ex){
-        
-        os << ex.__name << endl;
-        
+    ostream &operator<<(ostream &os, const DimensionalityMismatchEx &ex){
+        os << "DimenstionalityMisMatchEx" << " (current= " << ex.__current << "," << "rhs = " << ex.__rhs << ')';
     }
-
-//**************************************************
-//      EmptyClusterEx Class
-//***************************************************
-
-
-    EmptyClusterEx::EmptyClusterEx(){__name = "EmptyClusterEx";}
-
-    // Name Getter
-    string EmptyClusterEx::getName() const {return this -> __name;}
-
-
-    ostream &Clustering::operator<<(ostream &os, const EmptyClusterEx &ex){
-        
-        os << ex.__name << endl;
-        
+    ZeroClustersEx::ZeroClustersEx(){
+        __name = "ZeroClustersEx: ";
+    }
+    string ZeroClustersEx::getName() const{
+        return this -> __name;
+    }
+    ostream &operator<<(ostream &os, const ZeroClustersEx &ex){
+        os << ex.getName();
+        return os;
+    }
+    DataFileOpenEx::DataFileOpenEx(string filename) {
+        this-> __filename = filename;
+    }
+    string DataFileOpenEx::getFilename() const{
+        return this -> __filename;
+    }
+    string DataFileOpenEx::getName() const {
+        return this -> __name;
+    }
+    ostream &operator<<(ostream &os, const DataFileOpenEx &ex){
+        os << ex.getName() << ", filename is " << ex.getFilename();
+        return os;
+    }
+    ZeroDimensionsEx::ZeroDimensionsEx(){
+        __name = "ZeroDimensionsEx: ";
+    }
+    string ZeroDimensionsEx::getName() const {
+        return this -> __name;
+    }
+    ostream &operator<<(ostream &os, const ZeroDimensionsEx &ex){
+        os << ex.getName();
+        return os;
+    }
+    EmptyClusterEx::EmptyClusterEx(){
+        __name = "EmptyClusterEx: ";
+    }
+    string EmptyClusterEx::getName() const {
+        return this -> __name;
+    }
+    ostream &operator<<(ostream &os, const EmptyClusterEx &ex){
+        os << ex.getName();
+        return os;
     }
 }
